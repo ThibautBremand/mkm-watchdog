@@ -1,0 +1,14 @@
+delay = 60
+message = """
+{{.Name}}
+{{.Language}} {{.Condition}} {{.Price}}
+{{.Comment}}
+{{.Seller.Name}} | {{.Seller.Details}} | {{.Seller.Location}}
+{{.URL}}
+"""
+
+[[searches]]
+url = "your url here"
+
+[[searches]]
+url = "your url here"
