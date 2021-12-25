@@ -100,7 +100,7 @@ func parseArticle(
 
 	comment, exists := sel.Find("div.product-comments").Find("span").Last().Attr("data-original-title")
 	if !exists {
-		return Article{}, fmt.Errorf("could not find comment")
+		log.Printf("No comment available for listing with ID %s for URL %s", ID, URL)
 	}
 
 	price := sel.Find("div.price-container").Text()
