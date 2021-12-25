@@ -37,6 +37,11 @@ url = "https://www.cardmarket.com/en/Pokemon/Products/Singles/Neo-Genesis/Pikach
 Other parameters:  
 - `delay`: period, in seconds, between two scraping loops. Keep it reasonably high.
 
+#### Important notes:
+If an URLs returns a product with more than 50 article results, only the first 50 will be scraped since the scraper does 
+not handle the click on the "Show more results" button. One possible workaround is to use URLs with active filters 
+instead, such as languages or cards conditions filters.  
+
 ### Telegram and .env
 - First, you need to create a [Telegram account](https://desktop.telegram.org/).
 - Then, for the following steps, you need to download and use the desktop version.  
