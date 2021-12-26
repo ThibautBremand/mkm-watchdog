@@ -98,10 +98,8 @@ func parseArticle(
 		return Article{}, fmt.Errorf("could not find language")
 	}
 
-	comment, exists := sel.Find("div.product-comments").Find("span").Last().Attr("data-original-title")
-	if !exists {
-		log.Printf("No comment available for listing with ID %s for URL %s", ID, URL)
-	}
+	// No need to check existence since comment is optional. Some articles have an empty comment.
+	comment, _ := sel.Find("div.product-comments").Find("span").Last().Attr("data-original-title")
 
 	price := sel.Find("div.price-container").Text()
 
