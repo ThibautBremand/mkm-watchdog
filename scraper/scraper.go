@@ -88,20 +88,16 @@ func parseArticle(
 		return Article{}, fmt.Errorf("could not find ID")
 	}
 
-	condition, exists := sel.Find("div.product-attributes").Find("a").Attr("title")
-	if !exists {
-		return Article{}, fmt.Errorf("could not find condition")
-	}
+	// No need to check existence since condition is optional. For example there is no condition for sealed items.
+	condition, _ := sel.Find("div.product-attributes").Find("a").Attr("title")
 
 	language, exists := sel.Find("div.product-attributes").Find("span.icon").Attr("data-original-title")
 	if !exists {
 		return Article{}, fmt.Errorf("could not find language")
 	}
 
-	comment, exists := sel.Find("div.product-comments").Find("span").Last().Attr("data-original-title")
-	if !exists {
-		return Article{}, fmt.Errorf("could not find comment")
-	}
+	// No need to check existence since comment is optional. Some articles have an empty comment.
+	comment, _ := sel.Find("div.product-comments").Find("span").Last().Attr("data-original-title")
 
 	price := sel.Find("div.price-container").Text()
 
