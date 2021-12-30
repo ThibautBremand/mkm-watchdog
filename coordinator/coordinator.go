@@ -55,7 +55,7 @@ func (c *Coordinator) Start() {
 			sendToTelegram(newItems, c.Tpl)
 		}
 
-		refreshCache(m)
+		refreshCache(m, cached)
 
 		time.Sleep(c.SleepPeriod)
 	}
@@ -88,8 +88,8 @@ func keepNewItems(
 	return newArticles
 }
 
-func refreshCache(m map[string][]scraper.Article) {
-	toBeCached := buildCache(m)
+func refreshCache(m map[string][]scraper.Article, cached map[string][]cache.CachedArticle) {
+	toBeCached := buildCache(m, cached)
 	err := cache.UpdateCache(toBeCached)
 	if err != nil {
 		log.Println("error while writing cache, skipping", err)
@@ -98,7 +98,14 @@ func refreshCache(m map[string][]scraper.Article) {
 
 // buildCache takes a map[string][]scraper.Article and returns a ready to use map for the cache in the
 // map[string][]cache.CachedArticle format.
-func buildCache(m map[string][]scraper.Article) map[string][]cache.CachedArticle {
+// It uses the given cache as map[string][]cache.CachedArticle in order to manually add to the new cache the articles
+// from the previous cache that do not exist in the map m: probably because of scraping errors, which gave empty
+// results. That way, we keep our cache and do not scrape again all the articles for a certain URL when the scraping
+// failed.
+func buildCache(
+	m map[string][]scraper.Article,
+	cached map[string][]cache.CachedArticle,
+) map[string][]cache.CachedArticle {
 	res := make(map[string][]cache.CachedArticle)
 
 	for key, articles := range m {
@@ -106,6 +113,17 @@ func buildCache(m map[string][]scraper.Article) map[string][]cache.CachedArticle
 		for i, a := range articles {
 			res[key][i] = cache.CachedArticle{ID: a.ID}
 		}
+	}
+
+	for key, articles := range cached {
+		if _, ok := res[key]; ok {
+			// continue if the res already has articles for this key
+			continue
+		}
+
+		// res does not have any article for the given key: the scraping must have failed for this key
+		// we manually add to the res the cached articles from the current cache so we do not lose them
+		res[key] = articles
 	}
 
 	return res
