@@ -45,14 +45,18 @@ func (s *Scraper) Scrape() map[string][]Article {
 		log.Printf("Handling url %s\n", URL)
 		doc, err := web.Get(URL)
 		if err != nil {
-			log.Printf("could not make request to URL %s: %s\n", URL, err)
+			log.Printf("error: could not make request to URL %s: %s, skipping...", URL, err)
 			continue
+		}
+
+		if doc == nil {
+			log.Printf("error: received an empty document for URL %s, skipping...", URL)
 		}
 
 		res[URL] = parseDoc(doc, URL)
 
 		// We space each queries just in case, to prevent getting throttled
-		time.Sleep(2 * time.Second)
+		time.Sleep(4 * time.Second)
 	}
 
 	return res
