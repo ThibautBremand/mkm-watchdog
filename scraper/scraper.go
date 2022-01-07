@@ -61,7 +61,19 @@ func (s *Scraper) Scrape() map[string][]Article {
 func parseDoc(doc *goquery.Document, URL string) []Article {
 	articles := make([]Article, 0)
 
-	title := doc.Find("div.page-title-container").Find("h1").Text()
+	titleContainer := doc.Find("div.page-title-container")
+	if titleContainer == nil {
+		log.Printf("error: could not find titlecontainer for URL %s, skipping...", URL)
+		return articles
+	}
+
+	titleHeader := titleContainer.Find("h1")
+	if titleHeader == nil {
+		log.Printf("error: could not find title header for URL %s, skipping...", URL)
+		return articles
+	}
+
+	title := titleHeader.Text()
 	doc.Find("div.article-row").EachWithBreak(func(i int, sel *goquery.Selection) bool {
 		a, err := parseArticle(sel, title, URL)
 		if err != nil {
