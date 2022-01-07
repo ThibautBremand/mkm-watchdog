@@ -51,6 +51,7 @@ func (s *Scraper) Scrape() map[string][]Article {
 
 		if doc == nil {
 			log.Printf("error: received an empty document for URL %s, skipping...", URL)
+			continue
 		}
 
 		res[URL] = parseDoc(doc, URL)
