@@ -109,6 +109,12 @@ func buildCache(
 	res := make(map[string][]cache.CachedArticle)
 
 	for key, articles := range m {
+		if len(articles) == 0 {
+			// zero results means an error could have occurred during the scraping, so we'd rather read from the
+			// cache for this key
+			continue
+		}
+
 		res[key] = make([]cache.CachedArticle, len(articles))
 		for i, a := range articles {
 			res[key][i] = cache.CachedArticle{ID: a.ID}
