@@ -5,6 +5,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"log"
 	"mkm-watchdog/web"
+	"strings"
 	"time"
 )
 
@@ -28,6 +29,7 @@ type Article struct {
 	Quantity  string
 	URL       string
 	Seller    Seller
+	ExtraData string
 }
 
 type Seller struct {
@@ -122,6 +124,8 @@ func parseArticle(
 
 	sellerName := sel.Find("span.seller-name").Find("a").Text()
 
+	extraData := parseExtraData(sel)
+
 	s := Seller{
 		Name: sellerName,
 	}
@@ -136,6 +140,7 @@ func parseArticle(
 		Quantity:  quantity,
 		URL:       URL,
 		Seller:    s,
+		ExtraData: extraData,
 	}
 
 	sellerDetails, exists := sel.Find("span.seller-info").Find("span").Find(".badge").Attr("title")
@@ -154,6 +159,27 @@ func parseArticle(
 	a.Seller.Location = &sellerLocation
 
 	return a, nil
+}
+
+func parseExtraData(sel *goquery.Selection) string {
+	extraData := make([]string, 0)
+
+	sel.Find("span.st_SpecialIcon").EachWithBreak(func(i int, sel *goquery.Selection) bool {
+		extraDataAttr, ok := sel.Attr("data-original-title")
+		if !ok {
+			// Do not break out of the loop since we need to check the other extra data available
+			return true
+		}
+
+		extraData = append(extraData, extraDataAttr)
+		return true
+	})
+
+	if len(extraData) == 0 {
+		return ""
+	}
+
+	return strings.Join(extraData, ", ")
 }
 
 func (a Article) String() string {
