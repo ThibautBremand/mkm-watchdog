@@ -1,4 +1,4 @@
-FROM golang:buster
+FROM golang:alpine
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
